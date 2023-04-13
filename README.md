@@ -49,6 +49,6 @@ Result
 `100%|█████████▉| 24999/25000 [2:02:14<00:00,  3.59it/s]`
 `loss :  0.004267157102003693`
 
-![image.png](README%20md%2039e6beb13d8d480eb817b16ef875498f/image.png)
+![image.png](https://github.com/gno1234/NeRF-Implementation-Pytorch/blob/master/image/image.png)
 
-![loss and PSNR.png](README%20md%2039e6beb13d8d480eb817b16ef875498f/loss_and_PSNR.png)
+![loss and PSNR.png](https://github.com/gno1234/NeRF-Implementation-Pytorch/blob/master/image/loss%20and%20PSNR.png)
