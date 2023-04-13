@@ -9,10 +9,11 @@ device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
 
 ############################
-def one_iter(pose, image, f, n_coarse=64, n_fine=128, batch_size = 8192):
+def one_iter(model, pose, image, f, n_coarse=64, n_fine=128, batch_size = 8192):
     """
     During training, pixels from an image are randomly selected by the batch size.
     """
+    model = model
     d_cam, o_cam = generate_rays(pose, image, f)
     points_eval, t_eval, d_eval = ray_sampling(2, 7, n_coarse, d_cam, o_cam)
 
@@ -52,11 +53,11 @@ def one_iter(pose, image, f, n_coarse=64, n_fine=128, batch_size = 8192):
 
 
 ############################
-def eval_image(pose, image, f,n_coarse=64, n_fine=128, batch_size=8000):
+def eval_image(model, pose, image, f,n_coarse=64, n_fine=128, batch_size=8000):
     """
     When eval, sequentially select pixels from one image by the batch size.
     """
-    
+    model = model
     d_cam, o_cam = generate_rays(pose, image, f)
     points_eval, t_eval, d_eval = ray_sampling(2, 7, n_coarse, d_cam, o_cam)
 
@@ -141,10 +142,8 @@ def eval_image(pose, image, f,n_coarse=64, n_fine=128, batch_size=8000):
     #ax5.set_title('weights_mean_map', fontsize=10)
 
     fig.tight_layout()
-    
-    plt.show()
 
-    return
+    return fig
 ############################
 
 def mse_to_psnr(mse):

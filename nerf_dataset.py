@@ -17,8 +17,6 @@ class CustomDataset(Dataset):
 
         self.frames_length = len(train_json['frames'])
 
-        os.chdir(self.path)
-
         self.camera_angle = train_json['camera_angle_x']
 
         self.poses = [] 
@@ -28,7 +26,7 @@ class CustomDataset(Dataset):
 
         self.images = []
         for i in range(self.frames_length):
-            image_path = train_json['frames'][i]['file_path']
+            image_path =os.path.join(self.path, train_json['frames'][i]['file_path'])
             img = cv2.imread(image_path+".png")
             img = cv2.resize(img, (image_size, image_size))
             img_np = np.array(img)

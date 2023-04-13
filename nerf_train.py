@@ -8,13 +8,19 @@ from nerf_train_funtion import eval_image, one_iter, mse_to_psnr
 
 import matplotlib.pyplot as plt
 from tqdm import tqdm
+import os
 
 import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--dataset_path", type = str)
+parser.add_argument("--iter_num", type = int, default = 25000)
+parser.add_argument("--n_coarse", type = int,default = 64)
+parser.add_argument("--n_fine", type = int,default = 128)
 args = parser.parse_args()
 
+print(os.getcwd())
+os.makedirs('./progress/', exist_ok=True)
 
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
@@ -38,14 +44,17 @@ f = (image_height*0.5)/np.tan(angle*0.5)
 #model = torch.compile(model)
 
 lr = 5e-4
-iter_num =25000
-n_coarse = 64
-n_fine = 128
+iter_num = args.iter_num
+n_coarse = args.n_coarse
+n_fine = args.n_fine
 
 
 model.eval()
 pose, image = next(iter(train_dataloader))
-eval_image(pose, image, f, n_coarse=n_coarse, n_fine = n_fine, batch_size=4000)
+fig_eval = eval_image(model, pose, image, f, n_coarse=n_coarse, n_fine = n_fine, batch_size=4000)
+print(os.getcwd())
+plt.savefig('./progress/initial_state.png')
+
 model.train()
 
 optimizer = torch.optim.Adam(model.parameters(), lr=lr)
@@ -58,7 +67,7 @@ loss_record = [] # for record avg loss
 for i in tqdm(range(iter_num)):
 
     pose, image = next(iter(train_dataloader))
-    rgb, depth_map, loss = one_iter(pose, image, f, n_coarse=n_coarse, n_fine=n_fine, batch_size=4096)
+    rgb, depth_map, loss = one_iter(model, pose, image, f, n_coarse=n_coarse, n_fine=n_fine, batch_size=4096)
 
     loss.backward()
     optimizer.step()
@@ -79,7 +88,9 @@ for i in tqdm(range(iter_num)):
         model.eval()
         pose, image = next(iter(train_dataloader))
         with torch.no_grad():
-            eval_image(pose, image, f, n_coarse=n_coarse, n_fine=n_fine, batch_size=4000)
+            fig_eval = eval_image(model, pose, image, f, n_coarse=n_coarse, n_fine=n_fine, batch_size=4000)
+            path = "./progress/"+str(i+1)+'iter_eval_image.png'
+            plt.savefig(path)
         model.train()
 
         
@@ -98,5 +109,9 @@ for i in tqdm(range(iter_num)):
         ax2.set_ylabel('PSNR', color='r')
         ax2.tick_params('y', colors='r')
         fig.tight_layout()
-        plt.show()
+        path = "./progress/"+str(i+1)+'iter_eval_loss_PSNR.png'
+        plt.savefig(path)
         ##########################
+
+os.makedirs('./result/', exist_ok=True)
+torch.save(model.state_dict(), "./result/nerf_train_result.pt")

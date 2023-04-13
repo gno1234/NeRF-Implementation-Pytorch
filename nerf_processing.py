@@ -162,7 +162,7 @@ def Hierarchical_Volume_Sampling(weights:torch.Tensor, t:torch.Tensor, d:torch.T
 
     #Add the direction and origin of the camera to the fine sampling point.
     points_fine = torch.einsum('bn,bi->bni',t_fine,d) + o.expand(batch_size,n_fine,3).to(device)
-    d_fine = d.unsqueeze(1).expand_as(point_fine)
+    d_fine = d.unsqueeze(1).expand_as(points_fine)
 
     return points_fine, t_fine, d_fine
 #########################################################
