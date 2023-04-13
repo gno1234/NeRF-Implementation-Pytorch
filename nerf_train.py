@@ -1,5 +1,6 @@
 import torch
 from torch.utils.data import DataLoader
+import numpy as np
 
 from nerf_model import Nerf_network
 from nerf_dataset import CustomDataset
@@ -23,8 +24,16 @@ model = Nerf_network()
 model.to(device)
 model.apply(model._init_weights)
 
-train_dataset = CustomDataset(path = args.data_path ,image_size =200)
+train_dataset = CustomDataset(path = args.dataset_path ,image_size =200)
 train_dataloader = DataLoader(train_dataset, batch_size=1, shuffle=True)
+
+pose, image = next(iter(train_dataloader))
+image_height = image.size(1)
+
+angle = train_dataset.camera_angle
+angle_deg = angle * 180/np.pi
+f = (image_height*0.5)/np.tan(angle*0.5)
+
 
 #model = torch.compile(model)
 
