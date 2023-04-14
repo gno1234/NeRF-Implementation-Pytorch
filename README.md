@@ -35,7 +35,7 @@ dataset_path
 Additionally, you can use the following arguments
 
 ```python
---iter_nupe (default = 25000)
+--iter_num (default = 25000)
 --n_coarse (default = 64)
 --n_fine (default = 128)
 ```
